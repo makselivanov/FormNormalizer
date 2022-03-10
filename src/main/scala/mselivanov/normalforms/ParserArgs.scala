@@ -2,6 +2,7 @@ package mselivanov.normalforms
 
 import scala.annotation.tailrec
 import Constants._
+import scala.collection.mutable.Map
 
 object ParserArgs {
   val help_message: String =
@@ -17,16 +18,17 @@ Program Arguments:
         | read formula from file
     (--input, -i)
         | read formula from standard input
-    (--output, -o)
-        | write answers in file
-        | if not define, write to standard output
+    (--disable-hello-msg, -d)
+        | disable hello message
 Symbols used:
-    ^, &, &&     : Conjunction
-    v, |, ||     : Disjunction
+    ^, &&, &     : Conjunction
+    v, ||, |     : Disjunction
     ~, !         : Negation
     =>, ->       : Consequence
-    <=>, <->, == : Equivalence""".stripMargin
-
+    <=>, <->, == : Equivalence
+    True, T      : True
+    False, F     : False""".stripMargin
+  ///TODO make True False
   def filterTypeInputSymb(symb: Symbol): Boolean = {
     symb == pathSymb | symb == inputSymb
   }
@@ -50,10 +52,10 @@ Symbols used:
           sys.exit(2)
         }
         nextOption(options ++ Map(typeSymb -> getTypeForm(typeForm)), tail)
-      case ("--help" | "-h") :: tail             => nextOption(options ++ Map(helpSymb -> true), tail)
-      case ("--file" | "-f") :: path :: tail     => nextOption(options ++ Map(pathSymb -> path), tail)
-      case ("--input" | "-i") :: tail            => nextOption(options ++ Map(inputSymb -> true), tail)
-      case ("--output" | "-o") :: path :: tail   => nextOption(options ++ Map(outputSymb -> path), tail)
+      case ("--help" | "-h") :: tail              => nextOption(options ++ Map(helpSymb -> true), tail)
+      case ("--file" | "-f") :: path :: tail      => nextOption(options ++ Map(pathSymb -> path), tail)
+      case ("--input" | "-i") :: tail             => nextOption(options ++ Map(inputSymb -> true), tail)
+      case ("--disable-hello-msg" | "-d") :: tail => nextOption(options ++ Map(disableSymb -> true), tail)
       case option :: _ =>
         println("Unknown option: " ++ option)
         println("Type --help for all commands")
@@ -65,7 +67,7 @@ Symbols used:
   def parseArgs(args: List[String]): Options = {
     val options = nextOption(Map(), args)
     if (!(options contains typeSymb)) {
-      options += Map(typeSymb -> nnf)
+      options(typeSymb) = nnf
     }
     options
   }

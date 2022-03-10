@@ -4,6 +4,7 @@ import Constants.{nnf, cnf, dnf}
 
 object Normalizer {
   def normalize(typeForm : Symbol, formula: String): String = {
-    //TODO
+    val parsed = ParserFormula(formula)
+    formula //TODO chagne parsed to formula
   }
 }

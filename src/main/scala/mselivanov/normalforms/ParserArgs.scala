@@ -28,7 +28,6 @@ Symbols used:
     <=>, <->, == : Equivalence
     True, T      : True
     False, F     : False""".stripMargin
-  ///TODO make True False
   def filterTypeInputSymb(symb: Symbol): Boolean = {
     symb == pathSymb | symb == inputSymb
   }

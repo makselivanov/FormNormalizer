@@ -1,4 +1,5 @@
 package mselivanov.normalforms
+//scala -J-Xss20m
 
 import ParserArgs.{parseArgs, help_message, filterTypeInputSymb}
 import Normalizer.normalize
@@ -16,10 +17,15 @@ object Main {
     if (options contains pathSymb) {
       val buffSource: BufferedSource = Source.fromFile((options get pathSymb).asInstanceOf[String])
       for (line <- buffSource.getLines) {
-        val normForm = normalize((options get typeSymb).asInstanceOf[Symbol], line)
+        try {
+          val normForm = normalize((options get typeSymb).asInstanceOf[Symbol], line)
 
-        //Turn out, scala don't have built-in output in files...
-        println(normForm)
+          //Turn out, scala don't have built-in output in files...
+          println(normForm)
+        } catch {
+          case e: Throwable => println(e)
+        }
+
       }
       buffSource.close
     }
@@ -30,11 +36,19 @@ object Main {
       }
       while (true) {
         val formula = readLine()
-        val normForm = (options get typeSymb match {
-          case Some(s: Symbol) => normalize(s, formula)
-          case _ => throw new RuntimeException("didnt get type operation from options")
-        })
-        println(normForm)
+        if (formula.isEmpty)
+          return
+        try {
+          val normForm = (options get typeSymb match {
+            case Some(s: Symbol) => {
+              normalize(s, formula)
+            }
+            case _ => throw new RuntimeException("didnt get type operation from options")
+          })
+          println(normForm)
+        } catch {
+          case e: Throwable => println(e)
+        }
       }
     }
   }
